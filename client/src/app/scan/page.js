@@ -67,7 +67,14 @@ export default function ScanPage() {
       setScanning(true);
       const result = await scanReceipt(file);
       setScanResult(result.data);
-      toast.success('Bill scanned successfully!');
+      if (result.data && result.data.note) {
+        toast(result.data.note, {
+          icon: '⚠️',
+          duration: 6000,
+        });
+      } else {
+        toast.success('Bill scanned successfully!');
+      }
     } catch (err) {
       toast.error(err.message || 'Scan failed. Please try again.');
     } finally {
@@ -216,6 +223,23 @@ export default function ScanPage() {
 
             {/* Editable Form */}
             <div>
+              {scanResult.note && (
+                <div style={{
+                  background: 'rgba(245, 158, 11, 0.15)',
+                  border: '1px solid rgba(245, 158, 11, 0.3)',
+                  color: '#fbbf24',
+                  padding: '12px 16px',
+                  borderRadius: '8px',
+                  marginBottom: '20px',
+                  fontSize: '13px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}>
+                  <span>⚠️</span>
+                  <span>{scanResult.note}</span>
+                </div>
+              )}
               <div className="form-row">
                 <div className="form-group">
                   <label className="form-label">Amount (₹)</label>
