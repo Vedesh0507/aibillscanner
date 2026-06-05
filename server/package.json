@@ -1,0 +1,23 @@
+{
+  "name": "expense-manager-server",
+  "version": "1.0.0",
+  "description": "Backend API for Medical Sales Agent Expense Management System",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "dependencies": {
+    "cloudinary": "^2.5.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "exceljs": "^4.4.0",
+    "express": "^4.21.1",
+    "jspdf": "^2.5.2",
+    "jspdf-autotable": "^3.8.4",
+    "mongoose": "^8.9.5",
+    "multer": "^1.4.5-lts.1",
+    "@google/generative-ai": "^0.21.0"
+  }
+}
