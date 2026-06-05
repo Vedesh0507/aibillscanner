@@ -1,24 +1,38 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { getExpenses, deleteExpense, updateExpense } from '@/lib/api';
 import { formatCurrency, formatDate, toInputDate } from '@/lib/utils';
 import { CATEGORIES, CATEGORY_MAP } from '@/lib/constants';
 import toast from 'react-hot-toast';
+import { useSearchParams } from 'next/navigation';
 
-export default function HistoryPage() {
+function HistoryPageContent() {
+  const searchParams = useSearchParams();
+  const initialSearch = searchParams.get('search') || '';
+
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0 });
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(initialSearch);
   const [filterCategory, setFilterCategory] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [sortBy, setSortBy] = useState('date');
+  const [sortOrder, setSortOrder] = useState('desc');
   const [editModal, setEditModal] = useState(null);
   const [deleteModal, setDeleteModal] = useState(null);
   const [lightbox, setLightbox] = useState(null);
   const [editForm, setEditForm] = useState({});
   const [saving, setSaving] = useState(false);
+
+  // Sync search query from URL parameter if it changes (e.g. from navbar search)
+  useEffect(() => {
+    const urlSearch = searchParams.get('search');
+    if (urlSearch !== null) {
+      setSearch(urlSearch);
+    }
+  }, [searchParams]);
 
   const loadExpenses = useCallback(
     async (page = 1) => {
@@ -31,6 +45,8 @@ export default function HistoryPage() {
           category: filterCategory || undefined,
           startDate: startDate || undefined,
           endDate: endDate || undefined,
+          sortBy,
+          sortOrder,
         });
         setExpenses(res.data || []);
         setPagination(res.pagination || { page: 1, pages: 1, total: 0 });
@@ -40,7 +56,7 @@ export default function HistoryPage() {
         setLoading(false);
       }
     },
-    [search, filterCategory, startDate, endDate]
+    [search, filterCategory, startDate, endDate, sortBy, sortOrder]
   );
 
   useEffect(() => {
@@ -102,11 +118,11 @@ export default function HistoryPage() {
   return (
     <div>
       <div className="page-header">
-        <h2>📋 Expense History</h2>
-        <p>Search, filter, and manage all your expenses</p>
+        <h2>📋 Expense Ledger</h2>
+        <p>Search, filter, and audit all medical sales agent expense claims</p>
       </div>
 
-      {/* Filters */}
+      {/* Filters Card */}
       <div className="card" style={{ marginBottom: '20px' }}>
         <div className="filter-bar">
           <div className="search-input-wrapper">
@@ -114,34 +130,58 @@ export default function HistoryPage() {
             <input
               type="text"
               className="search-input"
-              placeholder="Search by description, vendor, or location..."
+              placeholder="Search description, vendor, or location..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          <input
-            type="date"
-            className="form-input"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            style={{ width: 'auto', minWidth: '140px' }}
-            title="Start date"
-          />
-          <input
-            type="date"
-            className="form-input"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            style={{ width: 'auto', minWidth: '140px' }}
-            title="End date"
-          />
+
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+            <input
+              type="date"
+              className="form-input"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              style={{ width: 'auto', minWidth: '135px' }}
+              title="Start date"
+            />
+            <input
+              type="date"
+              className="form-input"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              style={{ width: 'auto', minWidth: '135px' }}
+              title="End date"
+            />
+            
+            {/* Sorting Dropdown */}
+            <select
+              className="form-select"
+              value={`${sortBy}-${sortOrder}`}
+              onChange={(e) => {
+                const [by, order] = e.target.value.split('-');
+                setSortBy(by);
+                setSortOrder(order);
+              }}
+              style={{ width: 'auto', minWidth: '160px' }}
+              title="Sort Order"
+            >
+              <option value="date-desc">Newest First</option>
+              <option value="date-asc">Oldest First</option>
+              <option value="amount-desc">Amount: High to Low</option>
+              <option value="amount-asc">Amount: Low to High</option>
+              <option value="vendor-asc">Vendor: A to Z</option>
+              <option value="vendor-desc">Vendor: Z to A</option>
+            </select>
+          </div>
         </div>
-        <div className="filter-chips">
+
+        <div className="filter-chips" style={{ borderTop: '1px solid var(--border-glass)', paddingTop: '14px', marginTop: '12px' }}>
           <button
             className={`filter-chip ${!filterCategory ? 'active' : ''}`}
             onClick={() => setFilterCategory('')}
           >
-            All
+            All Categories
           </button>
           {CATEGORIES.map((cat) => (
             <button
@@ -157,7 +197,7 @@ export default function HistoryPage() {
         </div>
       </div>
 
-      {/* Expense Table */}
+      {/* Expense Table Card */}
       <div className="card">
         {loading ? (
           <div className="loading-page" style={{ minHeight: '200px' }}>
@@ -170,7 +210,7 @@ export default function HistoryPage() {
               style={{ fontSize: '13px', color: 'var(--text-muted)' }}
             >
               <span>
-                Showing {expenses.length} of {pagination.total} expenses
+                Showing {expenses.length} of {pagination.total} records
               </span>
             </div>
             <div className="table-container">
@@ -178,9 +218,9 @@ export default function HistoryPage() {
                 <thead>
                   <tr>
                     <th>Date</th>
-                    <th>Description</th>
-                    <th>Category</th>
                     <th>Vendor</th>
+                    <th>Category</th>
+                    <th>Description</th>
                     <th>Receipt</th>
                     <th style={{ textAlign: 'right' }}>Amount</th>
                     <th style={{ textAlign: 'right' }}>Actions</th>
@@ -190,13 +230,8 @@ export default function HistoryPage() {
                   {expenses.map((exp) => (
                     <tr key={exp._id}>
                       <td className="date-cell">{formatDate(exp.date, 'short')}</td>
-                      <td>
-                        <div>{exp.description}</div>
-                        {exp.location && (
-                          <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-                            📍 {exp.location}
-                          </div>
-                        )}
+                      <td style={{ fontWeight: 500, color: 'var(--text-primary)' }}>
+                        {exp.vendor || '—'}
                       </td>
                       <td>
                         <span
@@ -205,20 +240,27 @@ export default function HistoryPage() {
                           {CATEGORY_MAP[exp.category]?.icon} {exp.category}
                         </span>
                       </td>
-                      <td className="text-muted">{exp.vendor || '—'}</td>
+                      <td>
+                        <div>{exp.description}</div>
+                        {exp.location && (
+                          <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>
+                            📍 {exp.location}
+                          </div>
+                        )}
+                      </td>
                       <td>
                         {exp.receiptUrl ? (
                           <button
-                            className="btn btn-ghost btn-sm"
+                            className="btn btn-secondary btn-sm"
                             onClick={() => setLightbox(exp.receiptUrl)}
                             title="View receipt"
+                            style={{ padding: '4px 8px', fontSize: '11px' }}
                           >
                             🧾 View
                           </button>
                         ) : (
                           <span className="text-muted" style={{ fontSize: '11px' }}>
-                            {exp.entryMethod === 'ai_scan' ? '📸' : '✏️'}{' '}
-                            {exp.entryMethod === 'ai_scan' ? 'Scanned' : 'Manual'}
+                            {exp.entryMethod === 'ai_scan' ? '📸 Scanned' : '✏️ Manual'}
                           </span>
                         )}
                       </td>
@@ -231,6 +273,7 @@ export default function HistoryPage() {
                             className="btn btn-ghost btn-sm"
                             onClick={() => openEdit(exp)}
                             title="Edit"
+                            style={{ padding: '6px' }}
                           >
                             ✏️
                           </button>
@@ -238,7 +281,7 @@ export default function HistoryPage() {
                             className="btn btn-ghost btn-sm"
                             onClick={() => setDeleteModal(exp)}
                             title="Delete"
-                            style={{ color: 'var(--danger)' }}
+                            style={{ color: 'var(--danger)', padding: '6px' }}
                           >
                             🗑️
                           </button>
@@ -299,8 +342,8 @@ export default function HistoryPage() {
             <h3>No expenses found</h3>
             <p>
               {search || filterCategory || startDate
-                ? 'Try adjusting your filters'
-                : 'Start by scanning a bill or adding an expense'}
+                ? 'Try adjusting your filters or search terms'
+                : 'Start by scanning a bill or adding an expense manually'}
             </p>
           </div>
         )}
@@ -311,7 +354,7 @@ export default function HistoryPage() {
         <div className="modal-overlay" onClick={() => setEditModal(null)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <div className="modal-title">Edit Expense</div>
+              <div className="modal-title">Edit Expense Entry</div>
               <button className="modal-close" onClick={() => setEditModal(null)}>
                 ✕
               </button>
@@ -399,7 +442,7 @@ export default function HistoryPage() {
             </div>
 
             <div className="modal-footer">
-              <button className="btn btn-ghost" onClick={() => setEditModal(null)}>
+              <button className="btn btn-secondary" onClick={() => setEditModal(null)}>
                 Cancel
               </button>
               <button className="btn btn-primary" onClick={handleUpdate} disabled={saving}>
@@ -425,31 +468,32 @@ export default function HistoryPage() {
             style={{ maxWidth: '420px' }}
           >
             <div className="modal-header">
-              <div className="modal-title">Delete Expense</div>
+              <div className="modal-title">Delete Record</div>
               <button className="modal-close" onClick={() => setDeleteModal(null)}>
                 ✕
               </button>
             </div>
             <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>
-              Are you sure you want to delete this expense?
+              Are you sure you want to delete this expense record permanently?
             </p>
             <div
-              className="card"
               style={{
                 margin: '16px 0',
-                background: 'var(--bg-glass)',
-                padding: '16px',
+                background: 'var(--bg-tertiary)',
+                padding: '12px 16px',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--border-glass)',
               }}
             >
-              <div style={{ fontWeight: 600, marginBottom: '4px' }}>
+              <div style={{ fontWeight: 600, fontSize: '14px', marginBottom: '4px', color: 'var(--text-primary)' }}>
                 {deleteModal.description}
               </div>
-              <div className="text-muted" style={{ fontSize: '13px' }}>
+              <div className="text-muted" style={{ fontSize: '12px' }}>
                 {formatDate(deleteModal.date)} • {formatCurrency(deleteModal.amount)}
               </div>
             </div>
-            <div className="modal-footer">
-              <button className="btn btn-ghost" onClick={() => setDeleteModal(null)}>
+            <div className="modal-footer" style={{ borderTop: 'none', padding: 0 }}>
+              <button className="btn btn-secondary" onClick={() => setDeleteModal(null)}>
                 Cancel
               </button>
               <button className="btn btn-danger" onClick={handleDelete}>
@@ -467,5 +511,18 @@ export default function HistoryPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function HistoryPage() {
+  return (
+    <Suspense fallback={
+      <div className="loading-page">
+        <div className="loading-spinner lg"></div>
+        <p>Loading history...</p>
+      </div>
+    }>
+      <HistoryPageContent />
+    </Suspense>
   );
 }

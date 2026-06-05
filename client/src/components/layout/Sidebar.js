@@ -42,20 +42,32 @@ export default function Sidebar() {
           ))}
         </nav>
 
-        <div style={{ padding: '16px 20px', borderTop: '1px solid var(--border-glass)' }}>
-          <div
-            style={{
-              padding: '12px 16px',
-              borderRadius: 'var(--radius-md)',
-              background: 'var(--bg-glass)',
-              border: '1px solid var(--border-glass)',
-            }}
-          >
-            <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px' }}>
-              AI Powered by
+        <div style={{ padding: '16px 20px', borderTop: '1px solid var(--border-glass)', marginTop: 'auto' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div
+              style={{
+                width: '36px',
+                height: '36px',
+                borderRadius: '50%',
+                background: '#EFF6FF',
+                color: 'var(--accent-primary)',
+                fontWeight: 600,
+                fontSize: '13px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}
+            >
+              MS
             </div>
-            <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>
-              ✨ Google Gemini
+            <div style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+              <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+                Max Sterling
+              </span>
+              <span style={{ fontSize: '11px', color: 'var(--text-muted)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+                Medical Rep
+              </span>
             </div>
           </div>
         </div>

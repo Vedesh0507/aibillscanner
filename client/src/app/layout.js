@@ -1,5 +1,6 @@
 import './globals.css';
 import Sidebar from '@/components/layout/Sidebar';
+import Navbar from '@/components/layout/Navbar';
 import { Toaster } from 'react-hot-toast';
 
 export const metadata = {
@@ -16,17 +17,21 @@ export default function RootLayout({ children }) {
           position="top-right"
           toastOptions={{
             style: {
-              background: '#111631',
-              color: '#f1f5f9',
-              border: '1px solid rgba(255,255,255,0.06)',
-              borderRadius: '12px',
-              boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+              background: '#FFFFFF',
+              color: '#0F172A',
+              border: '1px solid #E2E8F0',
+              borderRadius: '8px',
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+              fontSize: '14px',
             },
           }}
         />
         <div className="app-layout">
           <Sidebar />
-          <main className="main-content">{children}</main>
+          <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: '100vh' }}>
+            <Navbar />
+            <main className="main-content">{children}</main>
+          </div>
         </div>
       </body>
     </html>

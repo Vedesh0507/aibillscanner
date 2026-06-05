@@ -121,117 +121,118 @@ export default function ScanPage() {
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
+  // Determine preview source
+  const displayImage = scanResult?.receiptUrl || preview;
+
   return (
     <div>
       <div className="page-header">
         <h2>📸 AI Bill Scanner</h2>
-        <p>Upload a bill, receipt, or invoice and let AI extract the details</p>
+        <p>Upload a bill, receipt, or invoice and let AI extract details automatically</p>
       </div>
 
-      {/* Upload Zone */}
-      {!scanResult && (
-        <div className="card" style={{ marginBottom: '24px' }}>
-          <div
-            className={`upload-zone ${dragging ? 'dragging' : ''} ${file ? 'has-file' : ''}`}
-            onClick={() => !scanning && fileInputRef.current?.click()}
-            onDrop={handleDrop}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-          >
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/jpeg,image/png,image/webp,image/gif,application/pdf"
-              onChange={(e) => handleFile(e.target.files[0])}
-              style={{ display: 'none' }}
-            />
-
-            {scanning ? (
-              <div className="scan-overlay">
-                <div className="scan-line" />
-                <span className="upload-icon">🔍</span>
-                <p className="upload-text">Scanning with AI...</p>
-                <p className="upload-subtext">Extracting expense details from your bill</p>
-                {preview && <img src={preview} alt="Scanning" className="upload-preview" style={{ opacity: 0.6 }} />}
+      <div className="scan-result">
+        {/* Left Column: Upload Area / Document Preview */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div className="card">
+            <div className="card-header" style={{ padding: 0, marginBottom: '16px', borderBottom: 'none' }}>
+              <div>
+                <div className="card-title">Receipt Document</div>
+                <div className="card-subtitle">Upload or drop receipt below</div>
               </div>
-            ) : file ? (
-              <>
-                <span className="upload-icon">✅</span>
-                <p className="upload-text">{file.name}</p>
-                <p className="upload-subtext">
-                  {(file.size / 1024).toFixed(0)} KB • Click to change
-                </p>
-                {preview && <img src={preview} alt="Preview" className="upload-preview" />}
-              </>
-            ) : (
-              <>
-                <span className="upload-icon">📷</span>
-                <p className="upload-text">Drop your bill here or click to upload</p>
-                <p className="upload-subtext">
-                  Supports JPEG, PNG, WebP, PDF — Max 10MB
-                </p>
-              </>
-            )}
-          </div>
+            </div>
 
-          {file && !scanning && (
             <div
-              className="flex gap-md"
-              style={{ marginTop: '20px', justifyContent: 'center' }}
+              className={`upload-zone ${dragging ? 'dragging' : ''} ${file ? 'has-file' : ''}`}
+              onClick={() => !scanning && fileInputRef.current?.click()}
+              onDrop={handleDrop}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              style={{ minHeight: '260px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}
             >
-              <button className="btn btn-primary btn-lg" onClick={handleScan}>
-                🔍 Scan with AI
-              </button>
-              <button className="btn btn-ghost" onClick={reset}>
-                ✕ Clear
-              </button>
-            </div>
-          )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif,application/pdf"
+                onChange={(e) => handleFile(e.target.files[0])}
+                style={{ display: 'none' }}
+              />
 
-          {scanning && (
-            <div className="flex-center gap-sm" style={{ marginTop: '20px' }}>
-              <div className="loading-spinner"></div>
-              <span className="text-muted" style={{ fontSize: '13px' }}>
-                AI is analyzing your bill...
-              </span>
+              {scanning ? (
+                <div className="scan-overlay" style={{ width: '100%' }}>
+                  <div className="scan-line" />
+                  <span className="upload-icon">🔍</span>
+                  <p className="upload-text">Scanning with AI...</p>
+                  <p className="upload-subtext">Extracting expense details</p>
+                  {preview && <img src={preview} alt="Scanning" className="upload-preview" style={{ opacity: 0.6 }} />}
+                </div>
+              ) : displayImage ? (
+                <>
+                  <span className="upload-icon">✅</span>
+                  <p className="upload-text" style={{ fontSize: '13px', wordBreak: 'break-all', padding: '0 8px' }}>
+                    {file?.name || 'receipt.jpg'}
+                  </p>
+                  <p className="upload-subtext" style={{ marginBottom: '12px' }}>
+                    {file ? `${(file.size / 1024).toFixed(0)} KB • ` : ''}Click to change file
+                  </p>
+                  <img src={displayImage} alt="Receipt Preview" className="upload-preview" />
+                </>
+              ) : (
+                <>
+                  <span className="upload-icon">📷</span>
+                  <p className="upload-text">Drop your bill here or click to upload</p>
+                  <p className="upload-subtext">
+                    Supports JPEG, PNG, WebP, PDF — Max 10MB
+                  </p>
+                </>
+              )}
             </div>
-          )}
-        </div>
-      )}
 
-      {/* Scan Result */}
-      {scanResult && (
-        <div className="card">
-          <div className="card-header">
-            <div>
-              <div className="card-title">✨ Extracted Information</div>
-              <div className="card-subtitle">
-                Review and edit before saving
-              </div>
-            </div>
-            <button className="btn btn-ghost btn-sm" onClick={reset}>
-              ← Scan Another
-            </button>
-          </div>
-
-          <div className="scan-result">
-            {/* Receipt Preview */}
-            {scanResult.receiptUrl && (
-              <div className="scan-receipt-preview">
-                <img src={scanResult.receiptUrl} alt="Receipt" />
-                <span className="scan-badge">✓ AI Scanned</span>
+            {file && !scanning && !scanResult && (
+              <div className="flex gap-md" style={{ marginTop: '20px' }}>
+                <button className="btn btn-primary" onClick={handleScan} style={{ width: '100%' }}>
+                  🔍 Scan with AI
+                </button>
+                <button className="btn btn-ghost" onClick={reset}>
+                  ✕ Clear
+                </button>
               </div>
             )}
 
-            {/* Editable Form */}
+            {file && !scanning && scanResult && (
+              <div style={{ marginTop: '16px' }}>
+                <button className="btn btn-secondary" onClick={reset} style={{ width: '100%' }}>
+                  ✕ Scan Another Document
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Right Column: Extracted Information Form */}
+        <div className="card">
+          {!scanResult ? (
+            <div className="empty-state" style={{ padding: '80px 20px' }}>
+              <div className="empty-state-icon">✨</div>
+              <h3>Waiting for Document</h3>
+              <p>Upload a distributor receipt or supplier invoice on the left to extract details.</p>
+            </div>
+          ) : (
             <div>
+              <div className="card-header" style={{ padding: 0, marginBottom: '20px', borderBottom: 'none' }}>
+                <div>
+                  <div className="card-title">Extracted Metadata</div>
+                  <div className="card-subtitle">Verify and correct information below</div>
+                </div>
+              </div>
+
               {scanResult.note && (
                 <div style={{
-                  background: 'rgba(245, 158, 11, 0.15)',
-                  border: '1px solid rgba(245, 158, 11, 0.3)',
-                  color: '#fbbf24',
-                  padding: '12px 16px',
-                  borderRadius: '8px',
+                  background: 'var(--warning-bg)',
+                  border: '1px solid rgba(245, 158, 11, 0.2)',
+                  color: 'var(--warning)',
+                  padding: '10px 14px',
+                  borderRadius: 'var(--radius-md)',
                   marginBottom: '16px',
                   fontSize: '13px',
                   display: 'flex',
@@ -243,23 +244,23 @@ export default function ScanPage() {
                 </div>
               )}
 
-              {/* Confidence Score (Requirement 5) */}
+              {/* Confidence Score */}
               {scanResult.confidence !== undefined && (
                 <div style={{
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
-                  background: 'rgba(255, 255, 255, 0.03)',
+                  background: 'var(--bg-tertiary)',
                   border: '1px solid var(--border-glass)',
-                  padding: '12px 16px',
-                  borderRadius: '8px',
+                  padding: '10px 14px',
+                  borderRadius: 'var(--radius-md)',
                   marginBottom: '16px',
                   fontSize: '13px'
                 }}>
                   <span className="text-muted">OCR Scanning Confidence:</span>
                   <span style={{
                     fontWeight: 'bold',
-                    color: scanResult.confidence >= 70 ? 'var(--accent-success)' : 'var(--accent-danger)',
+                    color: scanResult.confidence >= 70 ? 'var(--success)' : 'var(--danger)',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '6px'
@@ -270,30 +271,30 @@ export default function ScanPage() {
                 </div>
               )}
 
-              {/* Low Confidence Warning (Requirement 5) */}
+              {/* Low Confidence Warning */}
               {scanResult.confidence !== undefined && scanResult.confidence < 70 && (
                 <div style={{
-                  background: 'rgba(239, 68, 68, 0.12)',
-                  border: '1px solid rgba(239, 68, 68, 0.25)',
-                  color: '#f87171',
-                  padding: '12px 16px',
-                  borderRadius: '8px',
-                  marginBottom: '20px',
+                  background: 'var(--danger-bg)',
+                  border: '1px solid rgba(239, 68, 68, 0.15)',
+                  color: 'var(--danger)',
+                  padding: '10px 14px',
+                  borderRadius: 'var(--radius-md)',
+                  marginBottom: '16px',
                   fontSize: '13px',
                 }}>
                   ⚠️ **Low Scanning Confidence**: Some details might be missing or incorrect due to image quality. We have exposed the raw scanned text below so you can cross-check it.
                 </div>
               )}
 
-              {/* Collapsible raw scanned text (Requirement 5) */}
+              {/* Collapsible raw scanned text */}
               {((scanResult.confidence !== undefined && scanResult.confidence < 70) || showOcr) && scanResult.ocrText && (
-                <div style={{ marginBottom: '20px' }}>
-                  <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ marginBottom: '16px' }}>
+                  <label className="form-label" style={{ display: 'flex', justifycontent: 'space-between', alignItems: 'center' }}>
                     <span>Raw Scanned Text</span>
                     <button 
                       type="button" 
                       className="btn btn-ghost btn-sm" 
-                      style={{ height: 'auto', padding: '2px 8px', fontSize: '11px' }}
+                      style={{ height: 'auto', padding: '2px 8px', fontSize: '11px', marginLeft: 'auto' }}
                       onClick={() => setShowOcr(false)}
                     >
                       Hide Text
@@ -303,12 +304,12 @@ export default function ScanPage() {
                     className="form-textarea"
                     value={scanResult.ocrText}
                     readOnly
-                    rows={6}
+                    rows={5}
                     style={{
                       fontFamily: 'monospace',
                       fontSize: '11px',
-                      background: 'rgba(0, 0, 0, 0.25)',
-                      color: 'rgba(255, 255, 255, 0.8)',
+                      background: 'var(--bg-tertiary)',
+                      color: 'var(--text-secondary)',
                       borderColor: 'var(--border-glass)',
                       cursor: 'default'
                     }}
@@ -320,7 +321,7 @@ export default function ScanPage() {
                 <button 
                   type="button" 
                   className="btn btn-ghost btn-sm" 
-                  style={{ marginBottom: '20px', fontSize: '11px', display: 'block' }}
+                  style={{ marginBottom: '16px', fontSize: '11px', display: 'block', padding: '4px 8px' }}
                   onClick={() => setShowOcr(true)}
                 >
                   📄 Show Raw Scanned Text
@@ -366,13 +367,24 @@ export default function ScanPage() {
               </div>
 
               <div className="form-group">
-                <label className="form-label">Vendor / Shop Name</label>
+                <label className="form-label">Vendor</label>
                 <input
                   type="text"
                   className="form-input"
                   value={scanResult.vendor}
                   onChange={(e) => handleFieldChange('vendor', e.target.value)}
-                  placeholder="Shop or vendor name"
+                  placeholder="Vendor name"
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Location</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  value={scanResult.location || ''}
+                  onChange={(e) => handleFieldChange('location', e.target.value)}
+                  placeholder="e.g. City or Area"
                 />
               </div>
 
@@ -387,23 +399,12 @@ export default function ScanPage() {
                 />
               </div>
 
-              <div className="form-group">
-                <label className="form-label">Location (Optional)</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  value={scanResult.location || ''}
-                  onChange={(e) => handleFieldChange('location', e.target.value)}
-                  placeholder="City or area"
-                />
-              </div>
-
-              <div className="modal-footer" style={{ borderTop: 'none', paddingTop: 0 }}>
-                <button className="btn btn-ghost" onClick={reset}>
+              <div className="modal-footer" style={{ borderTop: 'none', padding: '16px 0 0 0', marginTop: '20px' }}>
+                <button className="btn btn-secondary" onClick={reset}>
                   Cancel
                 </button>
                 <button
-                  className="btn btn-primary btn-lg"
+                  className="btn btn-primary"
                   onClick={handleSave}
                   disabled={saving || !scanResult.amount || !scanResult.description}
                 >
@@ -417,9 +418,9 @@ export default function ScanPage() {
                 </button>
               </div>
             </div>
-          </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }

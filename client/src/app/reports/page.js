@@ -30,7 +30,7 @@ const CustomTooltip = ({ active, payload, label }) => {
     return (
       <div className="custom-tooltip">
         <p className="label">{label}</p>
-        <p className="value">{formatCurrency(payload[0].value)}</p>
+        <p className="value" style={{ color: '#2563EB', margin: 0 }}>{formatCurrency(payload[0].value)}</p>
       </div>
     );
   }
@@ -114,16 +114,17 @@ export default function ReportsPage() {
         <div className="flex-between" style={{ flexWrap: 'wrap', gap: '16px' }}>
           <div>
             <h2>📈 Reports & Analytics</h2>
-            <p>Analyze spending patterns and download reports</p>
+            <p>Export expenditure analytics and track category distributions</p>
           </div>
           <div className="btn-group">
             <button
-              className="btn btn-primary btn-sm"
+              className="btn btn-secondary btn-sm"
               onClick={() => handleDownload('excel')}
               disabled={!!downloading}
+              style={{ display: 'inline-flex', alignItems: 'center' }}
             >
               {downloading === 'excel' ? (
-                <><div className="loading-spinner" /> Preparing...</>
+                <><div className="loading-spinner" style={{ marginRight: '6px' }} /> Generating...</>
               ) : (
                 '📊 Download Excel'
               )}
@@ -132,9 +133,10 @@ export default function ReportsPage() {
               className="btn btn-secondary btn-sm"
               onClick={() => handleDownload('csv')}
               disabled={!!downloading}
+              style={{ display: 'inline-flex', alignItems: 'center' }}
             >
               {downloading === 'csv' ? (
-                <><div className="loading-spinner" /> Preparing...</>
+                <><div className="loading-spinner" style={{ marginRight: '6px' }} /> Generating...</>
               ) : (
                 '📄 Download CSV'
               )}
@@ -143,7 +145,7 @@ export default function ReportsPage() {
         </div>
       </div>
 
-      {/* Period Selector */}
+      {/* Period Selector Card */}
       <div className="card" style={{ marginBottom: '20px' }}>
         <div className="filter-bar" style={{ marginBottom: period === 'custom' ? '12px' : 0 }}>
           <div className="filter-chips">
@@ -159,7 +161,7 @@ export default function ReportsPage() {
           </div>
         </div>
         {period === 'custom' && (
-          <div className="flex gap-md" style={{ alignItems: 'center' }}>
+          <div className="flex gap-md" style={{ alignItems: 'center', marginTop: '10px' }}>
             <input
               type="date"
               className="form-input"
@@ -186,44 +188,53 @@ export default function ReportsPage() {
         </div>
       ) : (
         <>
-          {/* Summary Cards */}
+          {/* Summary Cards Grid */}
           <div className="stats-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
             <div className="stat-card today">
-              <div className="stat-card-icon">💰</div>
-              <div className="stat-card-label">Total Expenses</div>
+              <div className="stat-card-top">
+                <span className="stat-card-label">Total Expenses</span>
+                <div className="stat-card-icon">💰</div>
+              </div>
               <div className="stat-card-value">{formatCurrency(totalExpenses)}</div>
-              <div className="stat-card-sub">{totalCount} expenses</div>
+              <div className="stat-card-sub">
+                <span className="text-muted">{totalCount} total claims</span>
+              </div>
             </div>
+            
             <div className="stat-card week">
-              <div className="stat-card-icon">📊</div>
-              <div className="stat-card-label">Average Daily</div>
+              <div className="stat-card-top">
+                <span className="stat-card-label">Average Daily Spend</span>
+                <div className="stat-card-icon">📊</div>
+              </div>
               <div className="stat-card-value">{formatCurrency(avgDaily)}</div>
-              <div className="stat-card-sub">per day</div>
+              <div className="stat-card-sub">
+                <span className="text-muted">Across period</span>
+              </div>
             </div>
+
             <div className="stat-card month">
-              <div className="stat-card-icon">🏆</div>
-              <div className="stat-card-label">Top Category</div>
-              <div
-                className="stat-card-value"
-                style={{ fontSize: '18px' }}
-              >
+              <div className="stat-card-top">
+                <span className="stat-card-label">Top Category</span>
+                <div className="stat-card-icon">🏆</div>
+              </div>
+              <div className="stat-card-value" style={{ fontSize: '18px', display: 'flex', alignItems: 'center', minHeight: '36px' }}>
                 {topCategory
                   ? `${CATEGORY_MAP[topCategory.category]?.icon || ''} ${topCategory.category}`
                   : '—'}
               </div>
               <div className="stat-card-sub">
-                {topCategory ? formatCurrency(topCategory.total) : ''}
+                <span className="text-muted">{topCategory ? formatCurrency(topCategory.total) : 'No data'}</span>
               </div>
             </div>
           </div>
 
-          <div className="charts-grid">
+          <div className="charts-grid" style={{ marginTop: '24px' }}>
             {/* Category Bar Chart */}
             <div className="card">
               <div className="card-header">
                 <div>
                   <div className="card-title">Spending by Category</div>
-                  <div className="card-subtitle">Breakdown for selected period</div>
+                  <div className="card-subtitle">Claimed amounts per category</div>
                 </div>
               </div>
               {categoryData.length > 0 ? (
@@ -231,22 +242,24 @@ export default function ReportsPage() {
                   <BarChart
                     data={categoryData}
                     layout="vertical"
-                    margin={{ left: 20 }}
+                    margin={{ left: 15, right: 10, top: 10, bottom: 5 }}
                   >
-                    <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                    <XAxis type="number" tick={{ fontSize: 11 }} />
+                    <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#E2E8F0" />
+                    <XAxis type="number" tick={{ fontSize: 10, fill: '#64748B' }} axisLine={false} tickLine={false} />
                     <YAxis
                       type="category"
                       dataKey="category"
-                      tick={{ fontSize: 11 }}
-                      width={150}
+                      tick={{ fontSize: 10, fill: '#64748B' }}
+                      axisLine={false}
+                      tickLine={false}
+                      width={130}
                     />
                     <Tooltip content={<CustomTooltip />} />
-                    <Bar dataKey="total" radius={[0, 6, 6, 0]} barSize={20}>
-                      {categoryData.map((entry, i) => (
+                    <Bar dataKey="total" radius={[0, 4, 4, 0]} barSize={16}>
+                      {categoryData.map((entry) => (
                         <Cell
                           key={entry.category}
-                          fill={CATEGORY_MAP[entry.category]?.color || '#6b7280'}
+                          fill={CATEGORY_MAP[entry.category]?.color || '#64748B'}
                         />
                       ))}
                     </Bar>
@@ -254,7 +267,7 @@ export default function ReportsPage() {
                 </ResponsiveContainer>
               ) : (
                 <div className="empty-state" style={{ padding: '40px 0' }}>
-                  <p className="text-muted">No data for this period</p>
+                  <p className="text-muted">No data available for selected period</p>
                 </div>
               )}
             </div>
@@ -263,13 +276,13 @@ export default function ReportsPage() {
             <div className="card">
               <div className="card-header">
                 <div>
-                  <div className="card-title">Distribution</div>
-                  <div className="card-subtitle">Percentage by category</div>
+                  <div className="card-title">Category Distribution</div>
+                  <div className="card-subtitle">Percentage share</div>
                 </div>
               </div>
               {categoryData.length > 0 ? (
                 <>
-                  <ResponsiveContainer width="100%" height={220}>
+                  <ResponsiveContainer width="100%" height={180}>
                     <PieChart>
                       <Pie
                         data={categoryData}
@@ -277,8 +290,8 @@ export default function ReportsPage() {
                         nameKey="category"
                         cx="50%"
                         cy="50%"
-                        innerRadius={55}
-                        outerRadius={85}
+                        innerRadius={50}
+                        outerRadius={70}
                       >
                         {categoryData.map((entry, index) => (
                           <Cell key={entry.category} fill={pieColors[index]} />
@@ -287,14 +300,16 @@ export default function ReportsPage() {
                       <Tooltip
                         formatter={(value) => formatCurrency(value)}
                         contentStyle={{
-                          background: '#111631',
-                          border: '1px solid rgba(255,255,255,0.06)',
-                          borderRadius: '12px',
+                          background: '#FFFFFF',
+                          border: '1px solid #E2E8F0',
+                          borderRadius: '8px',
+                          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)',
                         }}
+                        itemStyle={{ color: '#0F172A', fontSize: '12px' }}
                       />
                     </PieChart>
                   </ResponsiveContainer>
-                  <div>
+                  <div style={{ maxHeight: '120px', overflowY: 'auto', marginTop: '12px' }}>
                     {categoryData.map((d) => {
                       const pct = totalExpenses > 0
                         ? ((d.total / totalExpenses) * 100).toFixed(1)
@@ -303,9 +318,9 @@ export default function ReportsPage() {
                         <div
                           key={d.category}
                           className="flex-between"
-                          style={{ padding: '5px 0', fontSize: '12px' }}
+                          style={{ padding: '4px 0', fontSize: '11px' }}
                         >
-                          <div className="flex gap-sm" style={{ alignItems: 'center' }}>
+                          <div className="flex gap-sm" style={{ alignItems: 'center', overflow: 'hidden' }}>
                             <span
                               style={{
                                 width: 8, height: 8, borderRadius: '50%',
@@ -313,11 +328,11 @@ export default function ReportsPage() {
                                 display: 'inline-block', flexShrink: 0,
                               }}
                             />
-                            <span className="text-muted">
+                            <span className="text-muted" style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
                               {CATEGORY_MAP[d.category]?.icon} {d.category}
                             </span>
                           </div>
-                          <span style={{ fontWeight: 500 }}>
+                          <span style={{ fontWeight: 500, color: 'var(--text-primary)' }}>
                             {pct}%
                           </span>
                         </div>
@@ -327,67 +342,61 @@ export default function ReportsPage() {
                 </>
               ) : (
                 <div className="empty-state" style={{ padding: '40px 0' }}>
-                  <p className="text-muted">No data</p>
+                  <p className="text-muted">No data available</p>
                 </div>
               )}
             </div>
           </div>
 
           {/* Trend Line Chart */}
-          <div className="card">
+          <div className="card" style={{ marginTop: '24px' }}>
             <div className="card-header">
               <div>
                 <div className="card-title">Spending Trend</div>
                 <div className="card-subtitle">
-                  {period === 'year' ? 'Monthly' : 'Daily'} spending over the selected period
+                  {period === 'year' ? 'Monthly' : 'Daily'} spending trend
                 </div>
               </div>
             </div>
             {trendData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={trendData}>
-                  <defs>
-                    <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
-                      <stop offset="0%" stopColor="#6366f1" />
-                      <stop offset="100%" stopColor="#8b5cf6" />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" tick={{ fontSize: 11 }} />
-                  <YAxis tick={{ fontSize: 11 }} />
+              <ResponsiveContainer width="100%" height={280}>
+                <LineChart data={trendData} margin={{ left: -10, right: 10, top: 10, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
+                  <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#64748B' }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 10, fill: '#64748B' }} axisLine={false} tickLine={false} />
                   <Tooltip content={<CustomTooltip />} />
                   <Line
                     type="monotone"
                     dataKey="total"
-                    stroke="url(#lineGradient)"
-                    strokeWidth={3}
-                    dot={{ fill: '#6366f1', r: 4 }}
-                    activeDot={{ r: 6, fill: '#8b5cf6' }}
+                    stroke="#2563EB"
+                    strokeWidth={2.5}
+                    dot={{ fill: '#2563EB', r: 3, strokeWidth: 1 }}
+                    activeDot={{ r: 5, fill: '#1D4ED8' }}
                   />
                 </LineChart>
               </ResponsiveContainer>
             ) : (
               <div className="empty-state" style={{ padding: '40px 0' }}>
-                <p className="text-muted">No trend data for this period</p>
+                <p className="text-muted">No trend data available for selected period</p>
               </div>
             )}
           </div>
 
           {/* Category Details Table */}
           {categoryData.length > 0 && (
-            <div className="card mt-lg">
+            <div className="card" style={{ marginTop: '24px' }}>
               <div className="card-header">
-                <div className="card-title">Category Details</div>
+                <div className="card-title">Category Audit Breakdown</div>
               </div>
               <div className="table-container">
                 <table className="expense-table">
                   <thead>
                     <tr>
                       <th>Category</th>
-                      <th style={{ textAlign: 'center' }}>Count</th>
-                      <th style={{ textAlign: 'right' }}>Total</th>
-                      <th style={{ textAlign: 'right' }}>Average</th>
-                      <th style={{ textAlign: 'right' }}>% of Total</th>
+                      <th style={{ textAlign: 'center' }}>Transactions</th>
+                      <th style={{ textAlign: 'right' }}>Total Claimed</th>
+                      <th style={{ textAlign: 'right' }}>Average Size</th>
+                      <th style={{ textAlign: 'right' }}>Percentage Share</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -429,7 +438,7 @@ export default function ReportsPage() {
                   </tbody>
                   <tfoot>
                     <tr>
-                      <td style={{ fontWeight: 700 }}>Total</td>
+                      <td style={{ fontWeight: 700 }}>Total Period Expenditures</td>
                       <td style={{ textAlign: 'center', fontWeight: 600 }}>{totalCount}</td>
                       <td
                         className="amount-cell"
