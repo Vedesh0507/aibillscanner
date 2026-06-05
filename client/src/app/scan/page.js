@@ -16,6 +16,7 @@ export default function ScanPage() {
   const [dragging, setDragging] = useState(false);
   const fileInputRef = useRef(null);
   const router = useRouter();
+  const [showOcr, setShowOcr] = useState(false);
 
   const handleFile = useCallback((selectedFile) => {
     if (!selectedFile) return;
@@ -116,6 +117,7 @@ export default function ScanPage() {
     setPreview(null);
     setScanResult(null);
     setScanning(false);
+    setShowOcr(false);
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
@@ -230,7 +232,7 @@ export default function ScanPage() {
                   color: '#fbbf24',
                   padding: '12px 16px',
                   borderRadius: '8px',
-                  marginBottom: '20px',
+                  marginBottom: '16px',
                   fontSize: '13px',
                   display: 'flex',
                   alignItems: 'center',
@@ -240,6 +242,91 @@ export default function ScanPage() {
                   <span>{scanResult.note}</span>
                 </div>
               )}
+
+              {/* Confidence Score (Requirement 5) */}
+              {scanResult.confidence !== undefined && (
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  border: '1px solid var(--border-glass)',
+                  padding: '12px 16px',
+                  borderRadius: '8px',
+                  marginBottom: '16px',
+                  fontSize: '13px'
+                }}>
+                  <span className="text-muted">OCR Scanning Confidence:</span>
+                  <span style={{
+                    fontWeight: 'bold',
+                    color: scanResult.confidence >= 70 ? 'var(--accent-success)' : 'var(--accent-danger)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}>
+                    {scanResult.confidence}% 
+                    {scanResult.confidence >= 70 ? '🟢 High' : '🔴 Low'}
+                  </span>
+                </div>
+              )}
+
+              {/* Low Confidence Warning (Requirement 5) */}
+              {scanResult.confidence !== undefined && scanResult.confidence < 70 && (
+                <div style={{
+                  background: 'rgba(239, 68, 68, 0.12)',
+                  border: '1px solid rgba(239, 68, 68, 0.25)',
+                  color: '#f87171',
+                  padding: '12px 16px',
+                  borderRadius: '8px',
+                  marginBottom: '20px',
+                  fontSize: '13px',
+                }}>
+                  ⚠️ **Low Scanning Confidence**: Some details might be missing or incorrect due to image quality. We have exposed the raw scanned text below so you can cross-check it.
+                </div>
+              )}
+
+              {/* Collapsible raw scanned text (Requirement 5) */}
+              {((scanResult.confidence !== undefined && scanResult.confidence < 70) || showOcr) && scanResult.ocrText && (
+                <div style={{ marginBottom: '20px' }}>
+                  <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>Raw Scanned Text</span>
+                    <button 
+                      type="button" 
+                      className="btn btn-ghost btn-sm" 
+                      style={{ height: 'auto', padding: '2px 8px', fontSize: '11px' }}
+                      onClick={() => setShowOcr(false)}
+                    >
+                      Hide Text
+                    </button>
+                  </label>
+                  <textarea
+                    className="form-textarea"
+                    value={scanResult.ocrText}
+                    readOnly
+                    rows={6}
+                    style={{
+                      fontFamily: 'monospace',
+                      fontSize: '11px',
+                      background: 'rgba(0, 0, 0, 0.25)',
+                      color: 'rgba(255, 255, 255, 0.8)',
+                      borderColor: 'var(--border-glass)',
+                      cursor: 'default'
+                    }}
+                  />
+                </div>
+              )}
+
+              {scanResult.confidence >= 70 && scanResult.ocrText && !showOcr && (
+                <button 
+                  type="button" 
+                  className="btn btn-ghost btn-sm" 
+                  style={{ marginBottom: '20px', fontSize: '11px', display: 'block' }}
+                  onClick={() => setShowOcr(true)}
+                >
+                  📄 Show Raw Scanned Text
+                </button>
+              )}
+
               <div className="form-row">
                 <div className="form-group">
                   <label className="form-label">Amount (₹)</label>
