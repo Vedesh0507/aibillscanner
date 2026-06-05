@@ -29,8 +29,11 @@ app.use(
       // Allow requests with no origin (like mobile apps, postman, curl)
       if (!origin) return callback(null, true);
       
-      // If wildcard is configured or origin matches, allow it
-      if (allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
+      // Foolproof fallback: automatically approve Vercel domains
+      const isVercelDomain = origin.endsWith('.vercel.app') || origin === 'https://aibillscanner.vercel.app';
+      
+      // If wildcard is configured, origin matches, or is a vercel domain, allow it
+      if (allowedOrigins.includes('*') || allowedOrigins.includes(origin) || isVercelDomain) {
         return callback(null, true);
       }
       
