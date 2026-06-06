@@ -344,7 +344,7 @@ export async function scanReceipt(imageBuffer, mimeType) {
     }
 
     console.log('✨ Sending text to Gemini AI for cleanup...');
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-3.5-flash' });
 
     const prompt = `You are an expert receipt parser. Analyze this raw text extracted from a medical sales agent's receipt, fix spelling/OCR errors, and extract structured JSON matching this schema:
 
