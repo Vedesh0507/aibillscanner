@@ -59,7 +59,7 @@ export default function AddExpensePage() {
   };
 
   return (
-    <div>
+    <div className="has-sticky-actions">
       <div className="page-header">
         <h2>➕ Add Expense</h2>
         <p>Manually record an expense when no bill is available</p>
@@ -69,39 +69,39 @@ export default function AddExpensePage() {
       <div className="card" style={{ marginBottom: '24px' }}>
         <div className="card-title mb-sm">⚡ Quick Add</div>
         <div className="card-subtitle mb-md">Common expenses — tap to pre-fill</div>
-        <div className="btn-group">
+        <div className="quick-add-grid">
           <button
-            className="btn btn-secondary btn-sm"
+            className="btn btn-secondary btn-sm quick-add-btn"
             onClick={() => quickAdd(50, 'Parking Charges', 'Parking at hospital')}
           >
             🅿️ Parking ₹50
           </button>
           <button
-            className="btn btn-secondary btn-sm"
+            className="btn btn-secondary btn-sm quick-add-btn"
             onClick={() => quickAdd(200, 'Food & Meals', 'Lunch during field visit')}
           >
             🍽️ Lunch ₹200
           </button>
           <button
-            className="btn btn-secondary btn-sm"
+            className="btn btn-secondary btn-sm quick-add-btn"
             onClick={() => quickAdd(100, 'Food & Meals', 'Tea and snacks')}
           >
             ☕ Tea ₹100
           </button>
           <button
-            className="btn btn-secondary btn-sm"
+            className="btn btn-secondary btn-sm quick-add-btn"
             onClick={() => quickAdd(500, 'Petrol/Fuel', 'Petrol refill')}
           >
             ⛽ Petrol ₹500
           </button>
           <button
-            className="btn btn-secondary btn-sm"
+            className="btn btn-secondary btn-sm quick-add-btn"
             onClick={() => quickAdd(30, 'Bus Travel', 'Bus ticket')}
           >
             🚌 Bus ₹30
           </button>
           <button
-            className="btn btn-secondary btn-sm"
+            className="btn btn-secondary btn-sm quick-add-btn"
             onClick={() => quickAdd(150, 'Miscellaneous', 'Auto/cab ride')}
           >
             🛺 Auto ₹150
@@ -203,7 +203,7 @@ export default function AddExpensePage() {
             </div>
           </div>
 
-          <div className="flex gap-md" style={{ marginTop: '24px' }}>
+          <div className="sticky-mobile-actions flex gap-md" style={{ marginTop: '24px' }}>
             <button
               type="submit"
               className="btn btn-primary btn-lg"

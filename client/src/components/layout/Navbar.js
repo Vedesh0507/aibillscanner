@@ -18,12 +18,12 @@ export default function Navbar() {
   return (
     <header className="navbar">
       {/* Mobile Branding */}
-      <div className="navbar-brand-mobile">
+      <div className="navbar-brand-mobile mobile-only">
         💼 ExpenseTrack
       </div>
 
       {/* Search Bar */}
-      <div className="navbar-search">
+      <div className="navbar-search desktop-only">
         <span className="navbar-search-icon">🔍</span>
         <input
           type="text"
@@ -38,16 +38,16 @@ export default function Navbar() {
       {/* Actions & Profile */}
       <div className="navbar-actions">
         {/* Quick Add Button */}
-        <Link href="/add" className="btn btn-secondary btn-sm">
+        <Link href="/add" className="btn btn-secondary btn-sm desktop-only">
           ➕ Quick Add
         </Link>
 
         {/* AI Scan Button */}
-        <Link href="/scan" className="btn btn-primary btn-sm">
+        <Link href="/scan" className="btn btn-primary btn-sm desktop-only">
           📸 AI Scan
         </Link>
 
-        <div className="navbar-divider" />
+        <div className="navbar-divider desktop-only" />
 
         {/* Notifications Icon */}
         <button className="navbar-notification-btn" title="System Notifications">
@@ -55,7 +55,7 @@ export default function Navbar() {
           <span className="navbar-notification-badge" />
         </button>
 
-        <div className="navbar-divider" style={{ display: 'none' }} />
+        <div className="navbar-divider desktop-only" style={{ display: 'none' }} />
 
         {/* User Profile */}
         <div className="navbar-profile">

@@ -136,7 +136,7 @@ function HistoryPageContent() {
             />
           </div>
 
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          <div className="responsive-filter-group">
             <input
               type="date"
               className="form-input"
@@ -213,7 +213,8 @@ function HistoryPageContent() {
                 Showing {expenses.length} of {pagination.total} records
               </span>
             </div>
-            <div className="table-container">
+            {/* Desktop Table View */}
+            <div className="table-container desktop-only">
               <table className="expense-table">
                 <thead>
                   <tr>
@@ -291,6 +292,64 @@ function HistoryPageContent() {
                   ))}
                 </tbody>
               </table>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="expense-card-list mobile-only">
+              {expenses.map((exp) => (
+                <div key={exp._id} className="expense-card">
+                  <div className="expense-card-header">
+                    <span className={`category-badge ${getCategoryBadgeClass(exp.category)}`}>
+                      {CATEGORY_MAP[exp.category]?.icon} {exp.category}
+                    </span>
+                    <span className="expense-card-amount">{formatCurrency(exp.amount)}</span>
+                  </div>
+                  <div className="expense-card-body">
+                    <div style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>
+                      {exp.description}
+                    </div>
+                    <div className="expense-card-meta">
+                      {exp.vendor && <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>🏢 {exp.vendor}</span>}
+                      {exp.location && <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>📍 {exp.location}</span>}
+                    </div>
+                  </div>
+                  <div className="expense-card-footer">
+                    <span className="expense-card-date">📅 {formatDate(exp.date, 'short')}</span>
+                    {exp.receiptUrl ? (
+                      <button
+                        className="btn btn-secondary btn-sm"
+                        onClick={() => setLightbox(exp.receiptUrl)}
+                        title="View receipt"
+                        style={{ padding: '4px 8px', fontSize: '11px' }}
+                      >
+                        🧾 View Receipt
+                      </button>
+                    ) : (
+                      <span className="text-muted" style={{ fontSize: '11px' }}>
+                        {exp.entryMethod === 'ai_scan' ? '📸 Scanned' : '✏️ Manual'}
+                      </span>
+                    )}
+                  </div>
+                  <div className="expense-card-actions">
+                    <button
+                      className="btn btn-ghost btn-sm"
+                      onClick={() => openEdit(exp)}
+                      title="Edit"
+                      style={{ padding: '6px 12px', fontSize: '13px' }}
+                    >
+                      ✏️ Edit
+                    </button>
+                    <button
+                      className="btn btn-ghost btn-sm"
+                      onClick={() => setDeleteModal(exp)}
+                      title="Delete"
+                      style={{ color: 'var(--danger)', padding: '6px 12px', fontSize: '13px' }}
+                    >
+                      🗑️ Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
 
             {/* Pagination */}

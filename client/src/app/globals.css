@@ -6,9 +6,9 @@
 
 :root {
   /* ─── Core Colors ─── */
-  --bg-primary: #F8FAFC;
+  --bg-primary: #FFFFFF;
   --bg-secondary: #FFFFFF;
-  --bg-tertiary: #F1F5F9;
+  --bg-tertiary: #F8FAFC;
   --bg-card: #FFFFFF;
   --bg-glass: #FFFFFF;
   --bg-glass-hover: #F8FAFC;
@@ -31,7 +31,7 @@
   --accent-primary: #2563EB;
   --accent-primary-light: #3B82F6;
   --accent-primary-dark: #1D4ED8;
-  --accent-gradient: linear-gradient(135deg, #2563EB, #1D4ED8);
+  --accent-gradient: #2563EB;
   --accent-glow: none;
 
   /* ─── Status ─── */
@@ -65,9 +65,9 @@
   --radius-full: 9999px;
 
   /* ─── Shadows ─── */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.05), 0 4px 6px -2px rgba(15, 23, 42, 0.03);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
   --shadow-glow: none;
 
   /* ─── Transitions ─── */
@@ -144,7 +144,7 @@ button {
 @media (max-width: 1024px) {
   .main-content {
     margin-left: 0;
-    padding: calc(var(--header-height) + 20px) 16px 88px 16px;
+    padding: calc(var(--header-height) + 20px) 16px calc(64px + 24px + env(safe-area-inset-bottom, 0px)) 16px;
   }
 }
 
@@ -260,18 +260,18 @@ button {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 64px;
   background: var(--bg-secondary);
   border-top: 1px solid var(--border-glass);
   z-index: 100;
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.03);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 .mobile-nav-inner {
   display: flex;
   align-items: center;
   justify-content: space-around;
-  height: 100%;
+  height: 64px;
 }
 
 .mobile-nav-item {
@@ -1453,3 +1453,183 @@ button {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 0, 0, 0.15);
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE OVERLAYS & UTILITIES
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Responsive Toggle helpers */
+@media (max-width: 1024px) {
+  .desktop-only {
+    display: none !important;
+  }
+}
+
+@media (min-width: 1025px) {
+  .mobile-only {
+    display: none !important;
+  }
+}
+
+/* Responsive Grid/Flex Utilities */
+.quick-add-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+  width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .quick-add-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .quick-add-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Form Sticky Action Footer for Mobile */
+@media (max-width: 768px) {
+  .sticky-mobile-actions {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border-glass);
+    padding: 12px 16px;
+    z-index: 99;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+    display: flex;
+    gap: 12px;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  }
+  
+  .sticky-mobile-actions button {
+    flex: 1;
+    margin: 0 !important;
+  }
+  
+  /* Add padding bottom to pages that have sticky buttons */
+  .has-sticky-actions {
+    padding-bottom: 80px;
+  }
+}
+
+/* Mobile Expense Card Layout */
+.expense-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.expense-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: all var(--transition-base);
+}
+
+.expense-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-glass-hover);
+}
+
+.expense-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.expense-card-amount {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.expense-card-vendor {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.expense-card-date {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.expense-card-body {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.expense-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.expense-card-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  border-top: 1px solid var(--border-glass);
+  padding-top: 10px;
+  margin-top: 4px;
+}
+
+/* Chart Overflow Wrapper */
+.chart-container-wrapper {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.responsive-filter-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 640px) {
+  .responsive-filter-group {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    width: 100% !important;
+    gap: 8px !important;
+  }
+  .responsive-filter-group select {
+    grid-column: span 2 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+  .responsive-filter-group input {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+  .search-input-wrapper {
+    width: 100% !important;
+  }
+}
+
+.reports-summary-grid {
+  grid-template-columns: repeat(3, 1fr) !important;
+}
+
+@media (max-width: 768px) {
+  .reports-summary-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+

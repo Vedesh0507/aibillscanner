@@ -189,7 +189,7 @@ export default function ReportsPage() {
       ) : (
         <>
           {/* Summary Cards Grid */}
-          <div className="stats-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+          <div className="stats-grid reports-summary-grid">
             <div className="stat-card today">
               <div className="stat-card-top">
                 <span className="stat-card-label">Total Expenses</span>
@@ -238,33 +238,35 @@ export default function ReportsPage() {
                 </div>
               </div>
               {categoryData.length > 0 ? (
-                <ResponsiveContainer width="100%" height={320}>
-                  <BarChart
-                    data={categoryData}
-                    layout="vertical"
-                    margin={{ left: 15, right: 10, top: 10, bottom: 5 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#E2E8F0" />
-                    <XAxis type="number" tick={{ fontSize: 10, fill: '#64748B' }} axisLine={false} tickLine={false} />
-                    <YAxis
-                      type="category"
-                      dataKey="category"
-                      tick={{ fontSize: 10, fill: '#64748B' }}
-                      axisLine={false}
-                      tickLine={false}
-                      width={130}
-                    />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Bar dataKey="total" radius={[0, 4, 4, 0]} barSize={16}>
-                      {categoryData.map((entry) => (
-                        <Cell
-                          key={entry.category}
-                          fill={CATEGORY_MAP[entry.category]?.color || '#64748B'}
-                        />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
+                <div className="chart-container-wrapper">
+                  <ResponsiveContainer width="100%" height={320}>
+                    <BarChart
+                      data={categoryData}
+                      layout="vertical"
+                      margin={{ left: 15, right: 10, top: 10, bottom: 5 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#E2E8F0" />
+                      <XAxis type="number" tick={{ fontSize: 10, fill: '#64748B' }} axisLine={false} tickLine={false} />
+                      <YAxis
+                        type="category"
+                        dataKey="category"
+                        tick={{ fontSize: 10, fill: '#64748B' }}
+                        axisLine={false}
+                        tickLine={false}
+                        width={130}
+                      />
+                      <Tooltip content={<CustomTooltip />} />
+                      <Bar dataKey="total" radius={[0, 4, 4, 0]} barSize={16}>
+                        {categoryData.map((entry) => (
+                          <Cell
+                            key={entry.category}
+                            fill={CATEGORY_MAP[entry.category]?.color || '#64748B'}
+                          />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
               ) : (
                 <div className="empty-state" style={{ padding: '40px 0' }}>
                   <p className="text-muted">No data available for selected period</p>
@@ -282,33 +284,35 @@ export default function ReportsPage() {
               </div>
               {categoryData.length > 0 ? (
                 <>
-                  <ResponsiveContainer width="100%" height={180}>
-                    <PieChart>
-                      <Pie
-                        data={categoryData}
-                        dataKey="total"
-                        nameKey="category"
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={50}
-                        outerRadius={70}
-                      >
-                        {categoryData.map((entry, index) => (
-                          <Cell key={entry.category} fill={pieColors[index]} />
-                        ))}
-                      </Pie>
-                      <Tooltip
-                        formatter={(value) => formatCurrency(value)}
-                        contentStyle={{
-                          background: '#FFFFFF',
-                          border: '1px solid #E2E8F0',
-                          borderRadius: '8px',
-                          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)',
-                        }}
-                        itemStyle={{ color: '#0F172A', fontSize: '12px' }}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
+                  <div className="chart-container-wrapper">
+                    <ResponsiveContainer width="100%" height={180}>
+                      <PieChart>
+                        <Pie
+                          data={categoryData}
+                          dataKey="total"
+                          nameKey="category"
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={50}
+                          outerRadius={70}
+                        >
+                          {categoryData.map((entry, index) => (
+                            <Cell key={entry.category} fill={pieColors[index]} />
+                          ))}
+                        </Pie>
+                        <Tooltip
+                          formatter={(value) => formatCurrency(value)}
+                          contentStyle={{
+                            background: '#FFFFFF',
+                            border: '1px solid #E2E8F0',
+                            borderRadius: '8px',
+                            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)',
+                          }}
+                          itemStyle={{ color: '#0F172A', fontSize: '12px' }}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
                   <div style={{ maxHeight: '120px', overflowY: 'auto', marginTop: '12px' }}>
                     {categoryData.map((d) => {
                       const pct = totalExpenses > 0
@@ -359,22 +363,24 @@ export default function ReportsPage() {
               </div>
             </div>
             {trendData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={280}>
-                <LineChart data={trendData} margin={{ left: -10, right: 10, top: 10, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
-                  <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#64748B' }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fontSize: 10, fill: '#64748B' }} axisLine={false} tickLine={false} />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Line
-                    type="monotone"
-                    dataKey="total"
-                    stroke="#2563EB"
-                    strokeWidth={2.5}
-                    dot={{ fill: '#2563EB', r: 3, strokeWidth: 1 }}
-                    activeDot={{ r: 5, fill: '#1D4ED8' }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+              <div className="chart-container-wrapper">
+                <ResponsiveContainer width="100%" height={280}>
+                  <LineChart data={trendData} margin={{ left: -10, right: 10, top: 10, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
+                    <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#64748B' }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 10, fill: '#64748B' }} axisLine={false} tickLine={false} />
+                    <Tooltip content={<CustomTooltip />} />
+                    <Line
+                      type="monotone"
+                      dataKey="total"
+                      stroke="#2563EB"
+                      strokeWidth={2.5}
+                      dot={{ fill: '#2563EB', r: 3, strokeWidth: 1 }}
+                      activeDot={{ r: 5, fill: '#1D4ED8' }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
             ) : (
               <div className="empty-state" style={{ padding: '40px 0' }}>
                 <p className="text-muted">No trend data available for selected period</p>

@@ -209,27 +209,29 @@ export default function DashboardPage() {
             </div>
           </div>
           {trendData.length > 0 ? (
-            <ResponsiveContainer width="100%" height={280}>
-              <AreaChart data={trendData} margin={{ left: -10, right: 10, top: 10, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="trendGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#2563EB" stopOpacity={0.15} />
-                    <stop offset="100%" stopColor="#2563EB" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
-                <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#64748B' }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 10, fill: '#64748B' }} axisLine={false} tickLine={false} />
-                <Tooltip content={<CustomTooltip />} />
-                <Area
-                  type="monotone"
-                  dataKey="total"
-                  stroke="#2563EB"
-                  strokeWidth={2}
-                  fill="url(#trendGradient)"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
+            <div className="chart-container-wrapper">
+              <ResponsiveContainer width="100%" height={280}>
+                <AreaChart data={trendData} margin={{ left: -10, right: 10, top: 10, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="trendGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#2563EB" stopOpacity={0.15} />
+                      <stop offset="100%" stopColor="#2563EB" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
+                  <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#64748B' }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 10, fill: '#64748B' }} axisLine={false} tickLine={false} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Area
+                    type="monotone"
+                    dataKey="total"
+                    stroke="#2563EB"
+                    strokeWidth={2}
+                    fill="url(#trendGradient)"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
           ) : (
             <div className="empty-state" style={{ padding: '40px 0' }}>
               <p className="text-muted">No trend data available yet</p>
@@ -247,35 +249,37 @@ export default function DashboardPage() {
           </div>
           {categoryData.length > 0 ? (
             <>
-              <ResponsiveContainer width="100%" height={160}>
-                <PieChart>
-                  <Pie
-                    data={categoryData}
-                    dataKey="total"
-                    nameKey="category"
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={45}
-                    outerRadius={65}
-                    labelLine={false}
-                    label={renderCustomLabel}
-                  >
-                    {categoryData.map((entry, index) => (
-                      <Cell key={entry.category} fill={pieColors[index]} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    formatter={(value) => formatCurrency(value)}
-                    contentStyle={{
-                      background: '#FFFFFF',
-                      border: '1px solid #E2E8F0',
-                      borderRadius: '8px',
-                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)',
-                    }}
-                    itemStyle={{ color: '#0F172A', fontSize: '12px' }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
+              <div className="chart-container-wrapper">
+                <ResponsiveContainer width="100%" height={160}>
+                  <PieChart>
+                    <Pie
+                      data={categoryData}
+                      dataKey="total"
+                      nameKey="category"
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={45}
+                      outerRadius={65}
+                      labelLine={false}
+                      label={renderCustomLabel}
+                    >
+                      {categoryData.map((entry, index) => (
+                        <Cell key={entry.category} fill={pieColors[index]} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      formatter={(value) => formatCurrency(value)}
+                      contentStyle={{
+                        background: '#FFFFFF',
+                        border: '1px solid #E2E8F0',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)',
+                      }}
+                      itemStyle={{ color: '#0F172A', fontSize: '12px' }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
               <div style={{ marginTop: '12px', maxHeight: '120px', overflowY: 'auto' }}>
                 {categoryData.slice(0, 5).map((d) => (
                   <div
@@ -323,36 +327,68 @@ export default function DashboardPage() {
           </Link>
         </div>
         {recentExpenses.length > 0 ? (
-          <div className="table-container">
-            <table className="expense-table">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Description</th>
-                  <th>Category</th>
-                  <th>Vendor</th>
-                  <th style={{ textAlign: 'right' }}>Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recentExpenses.map((exp) => (
-                  <tr key={exp._id}>
-                    <td className="date-cell">{formatDate(exp.date, 'short')}</td>
-                    <td>{exp.description}</td>
-                    <td>
-                      <span className={`category-badge ${getCategoryBadgeClass(exp.category)}`}>
-                        {CATEGORY_MAP[exp.category]?.icon} {exp.category}
-                      </span>
-                    </td>
-                    <td>{exp.vendor || '—'}</td>
-                    <td className="amount-cell" style={{ textAlign: 'right' }}>
-                      {formatCurrency(exp.amount)}
-                    </td>
+          <>
+            {/* Desktop Table View */}
+            <div className="table-container desktop-only">
+              <table className="expense-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Vendor</th>
+                    <th style={{ textAlign: 'right' }}>Amount</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {recentExpenses.map((exp) => (
+                    <tr key={exp._id}>
+                      <td className="date-cell">{formatDate(exp.date, 'short')}</td>
+                      <td>{exp.description}</td>
+                      <td>
+                        <span className={`category-badge ${getCategoryBadgeClass(exp.category)}`}>
+                          {CATEGORY_MAP[exp.category]?.icon} {exp.category}
+                        </span>
+                      </td>
+                      <td>{exp.vendor || '—'}</td>
+                      <td className="amount-cell" style={{ textAlign: 'right' }}>
+                        {formatCurrency(exp.amount)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="expense-card-list mobile-only">
+              {recentExpenses.map((exp) => (
+                <div key={exp._id} className="expense-card">
+                  <div className="expense-card-header">
+                    <span className={`category-badge ${getCategoryBadgeClass(exp.category)}`}>
+                      {CATEGORY_MAP[exp.category]?.icon} {exp.category}
+                    </span>
+                    <span className="expense-card-amount">{formatCurrency(exp.amount)}</span>
+                  </div>
+                  <div className="expense-card-body">
+                    <div style={{ fontWeight: 500, color: 'var(--text-primary)', marginBottom: '4px' }}>
+                      {exp.description}
+                    </div>
+                    {exp.vendor && (
+                      <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                        🏢 {exp.vendor}
+                      </div>
+                    )}
+                  </div>
+                  <div className="expense-card-footer">
+                    <span className="expense-card-date">
+                      📅 {formatDate(exp.date, 'short')}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         ) : (
           <div className="empty-state">
             <div className="empty-state-icon">💰</div>

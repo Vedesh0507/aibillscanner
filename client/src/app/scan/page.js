@@ -125,7 +125,7 @@ export default function ScanPage() {
   const displayImage = scanResult?.receiptUrl || preview;
 
   return (
-    <div>
+    <div className="has-sticky-actions">
       <div className="page-header">
         <h2>📸 AI Bill Scanner</h2>
         <p>Upload a bill, receipt, or invoice and let AI extract details automatically</p>
@@ -399,7 +399,7 @@ export default function ScanPage() {
                 />
               </div>
 
-              <div className="modal-footer" style={{ borderTop: 'none', padding: '16px 0 0 0', marginTop: '20px' }}>
+              <div className="modal-footer sticky-mobile-actions" style={{ borderTop: 'none', padding: '16px 0 0 0', marginTop: '20px' }}>
                 <button className="btn btn-secondary" onClick={reset}>
                   Cancel
                 </button>
